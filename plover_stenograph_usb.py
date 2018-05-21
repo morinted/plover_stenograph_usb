@@ -92,7 +92,7 @@ class StenoPacket(object):
     _STRUCT = Struct(_STRUCT_FORMAT)
 
     ID_ERROR = 0x6
-    ID_OPEN = 0x12
+    ID_OPEN = 0x11
     ID_READ = 0x13
 
 
@@ -166,11 +166,11 @@ class StenoPacket(object):
         return packet
 
     @staticmethod
-    def make_open_request(file_name=b'REALTIME.000', disk_id=b'A'):
+    def make_open_request(file_name=b'REALTIME.000\x00\x00\x00\x00', disk_id=b'A'):
         """Request to open a file on the writer, defaults to the realtime file."""
         return StenoPacket(
             packet_id=StenoPacket.ID_OPEN,
-            p1=ord(disk_id),
+            p1=ord(disk_id) if disk_id else 0, # Omitting p1 may use the default drive.
             data=file_name,
         )
 
