@@ -1,10 +1,22 @@
 Plover Stenograph USB
 =====================
 
-Use Stenograph Diamanté and Luminex machines on Plover. The plugin may
-not work with other machines. If it does, please let me know.
+Use Stenograph machines such as the Luminex, Diamanté, and Protégé on Plover. The plugin may
+not work with other machines.
 
 Special thanks to Keith McCready for his guidance and support.
+
+Tested Machines
+---------------
+
+If you test another machine, please let me know whether it works or not.
+
+- Working
+  - Luminex
+  - Diamanté
+  - Protégé
+- Not Working
+  - Unknown
 
 Get the Drivers
 ---------------

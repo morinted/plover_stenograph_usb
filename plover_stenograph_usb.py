@@ -168,6 +168,7 @@ class StenoPacket(object):
     @staticmethod
     def make_open_request(file_name=b'REALTIME.000\x00\x00\x00\x00', disk_id=b'A'):
         """Request to open a file on the writer, defaults to the realtime file."""
+        # Concern: realtime file seems to need 4 null bytes. Maybe to round up to 0x10?
         return StenoPacket(
             packet_id=StenoPacket.ID_OPEN,
             p1=ord(disk_id) if disk_id else 0, # Omitting p1 may use the default drive.
