@@ -403,7 +403,11 @@ else:
                 return self._connected
 
             # Copy the default configuration.
-            usb_device.set_configuration()
+            try:
+                usb_device.set_configuration()
+            except core.USBError as e:
+                log.warning('Error connecting: %s', e)
+                self._error()
             config = usb_device.get_active_configuration()
             interface = config[(0, 0)]
 
