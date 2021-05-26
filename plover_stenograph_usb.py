@@ -686,15 +686,19 @@ class Stenograph(ThreadedStenotypeBase):
                     log.warning('Stenograph reconnected.')
                     self._ready()
             except NoRealtimeFileException:
+                log.debug('NoRealtimeFileException')
                 # User hasn't started writing, just keep opening the realtime file
                 state.reset()
             except FinishedReadingClosedFileException:
+                log.debug('FinishedReadingClosedFileException')
                 # File closed! Open the realtime file.
                 state.reset()
             else:
+                log.debug('response length: %u', response.data_length)
                 if response.data_length:
                     state.offset += response.data_length
                 elif not state.realtime:
+                    log.debug('state realtime')
                     state.realtime = True
                 if response.data_length and state.realtime:
                     for stroke in response.strokes():
