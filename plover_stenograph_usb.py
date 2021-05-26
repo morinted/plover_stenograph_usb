@@ -225,33 +225,26 @@ class AbstractStenographMachine:
         """Send a StenoPacket to the machine and return the response or None"""
         raise NotImplementedError('send_receive() is not implemented')
 
+
 if sys.platform.startswith('win32'):
-    from ctypes import (
-        Structure,
-        POINTER,
-        c_ulonglong,
-        windll,
-        create_string_buffer,
-        sizeof,
-        byref,
-        pointer,
-        c_char,
-    )
-    from ctypes.wintypes import DWORD, HANDLE, BYTE
+
+    # For Windows we directly call Windows API functions.
+
+    from ctypes import windll, wintypes
+    import ctypes
     import uuid
 
     # Class GUID for Stenograph USB Writer
     USB_WRITER_GUID = uuid.UUID('{c5682e20-8059-604a-b761-77c4de9d5dbf}')
 
-    class DeviceInterfaceData(Structure):
+    class DeviceInterfaceData(ctypes.Structure):
         _fields_ = [
-            ('cbSize', DWORD),
-            ('InterfaceClassGuid', BYTE * 16),
-            ('Flags', DWORD),
-            ('Reserved', POINTER(c_ulonglong))
+            ('cbSize', wintypes.DWORD),
+            ('InterfaceClassGuid', wintypes.BYTE * 16),
+            ('Flags', wintypes.DWORD),
+            ('Reserved', ctypes.POINTER(ctypes.c_ulonglong))
         ]
 
-    # For Windows we directly call Windows API functions
     SetupDiGetClassDevs = windll.setupapi.SetupDiGetClassDevsA
     SetupDiEnumDeviceInterfaces = windll.setupapi.SetupDiEnumDeviceInterfaces
     SetupDiGetInterfaceDeviceDetail = (
@@ -266,29 +259,30 @@ if sys.platform.startswith('win32'):
     ERROR_INSUFFICIENT_BUFFER = 122
 
     class StenographMachine:
+
         def __init__(self):
-            self._usb_device = HANDLE(0)
-            self._read_buffer = create_string_buffer(MAX_READ + StenoPacket.HEADER_SIZE)
+            self._usb_device = wintypes.HANDLE(0)
+            self._read_buffer = ctypes.create_string_buffer(MAX_READ + StenoPacket.HEADER_SIZE)
 
         @staticmethod
         def _open_device_instance(device_info, guid):
             dev_interface_data = DeviceInterfaceData()
-            dev_interface_data.cbSize = sizeof(dev_interface_data)
+            dev_interface_data.cbSize = ctypes.sizeof(dev_interface_data)
 
             status = SetupDiEnumDeviceInterfaces(
-                device_info, None, guid.bytes, 0, byref(dev_interface_data))
+                device_info, None, guid.bytes, 0, ctypes.byref(dev_interface_data))
             if status == 0:
                 log.debug('status is zero')
                 return INVALID_HANDLE_VALUE
 
-            request_length = DWORD(0)
+            request_length = wintypes.DWORD(0)
             # Call with None to see how big a buffer we need for detail data.
             SetupDiGetInterfaceDeviceDetail(
                 device_info,
-                byref(dev_interface_data),
+                ctypes.byref(dev_interface_data),
                 None,
                 0,
-                pointer(request_length),
+                ctypes.pointer(request_length),
                 None
             )
             err = GetLastError()
@@ -298,17 +292,17 @@ if sys.platform.startswith('win32'):
 
             characters = request_length.value
 
-            class DeviceDetailData(Structure):
-                _fields_ = [('cbSize', DWORD),
-                            ('DevicePath', c_char * characters)]
+            class DeviceDetailData(ctypes.Structure):
+                _fields_ = [('cbSize', wintypes.DWORD),
+                            ('DevicePath', ctypes.c_char * characters)]
 
             dev_detail_data = DeviceDetailData()
             dev_detail_data.cbSize = 5
 
             # Now put the actual detail data into the buffer
             status = SetupDiGetInterfaceDeviceDetail(
-                device_info, byref(dev_interface_data), byref(dev_detail_data),
-                characters, pointer(request_length), None
+                device_info, ctypes.byref(dev_interface_data), ctypes.byref(dev_detail_data),
+                characters, ctypes.pointer(request_length), None
             )
             if not status:
                 log.debug('not status')
@@ -331,24 +325,24 @@ if sys.platform.startswith('win32'):
             return usb_device
 
         def _usb_write_packet(self, request):
-            bytes_written = DWORD(0)
+            bytes_written = wintypes.DWORD(0)
             request_packet = request.pack()
             WriteFile(
                 self._usb_device,
                 request_packet,
                 StenoPacket.HEADER_SIZE + request.data_length,
-                byref(bytes_written),
+                ctypes.byref(bytes_written),
                 None
             )
             return bytes_written.value
 
         def _usb_read_packet(self):
-            bytes_read = DWORD(0)
+            bytes_read = wintypes.DWORD(0)
             ReadFile(
               self._usb_device,
-              byref(self._read_buffer),
+              ctypes.byref(self._read_buffer),
               MAX_READ + StenoPacket.HEADER_SIZE,
-              byref(bytes_read),
+              ctypes.byref(bytes_read),
               None
             )
             # Return None if not enough data was read.
@@ -379,7 +373,9 @@ if sys.platform.startswith('win32'):
                 return None
             writer_packet = self._usb_read_packet()
             return writer_packet
+
 else:
+
     from usb import core, util
 
     class StenographMachine(AbstractStenographMachine):
