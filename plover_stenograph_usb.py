@@ -657,6 +657,7 @@ class Stenograph(ThreadedStenotypeBase):
     def run(self):
 
         class ReadState:
+
             def __init__(self):
                 self.realtime = False  # Not realtime until we get a 0-length response
                 self.realtime_file_open = False  # We are reading from a file
