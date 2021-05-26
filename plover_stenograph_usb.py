@@ -613,17 +613,12 @@ class Stenograph(ThreadedStenotypeBase):
             self.start()
 
     def _connect_machine(self):
-        connected = False
         try:
-            connected = self._machine.connect()
-        except ValueError:
-            log.warning('Libusb must be installed.')
+            return self._machine.connect()
+        except Exception:
+            log.warning('Error connecting', exc_info=True)
             self._error()
-        except AssertionError as e:
-            log.warning('Error connecting: %s', e)
-            self._error()
-        finally:
-            return connected
+        return False
 
     def _reconnect(self):
         self._initializing()
