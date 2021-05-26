@@ -73,7 +73,7 @@ VENDOR_ID = 0x112b
 MAX_READ = 0x200  # Arbitrary read limit
 
 
-class StenoPacket(object):
+class StenoPacket:
     """
     Stenograph StenoPacket helper
 
@@ -210,7 +210,7 @@ class StenoPacket(object):
         return strokes
 
 
-class AbstractStenographMachine(object):
+class AbstractStenographMachine:
     """Simple interface to connect with and send data to a Stenograph machine"""
 
     def connect(self) -> bool:
@@ -265,7 +265,7 @@ if sys.platform.startswith('win32'):
     INVALID_HANDLE_VALUE = -1
     ERROR_INSUFFICIENT_BUFFER = 122
 
-    class StenographMachine(object):
+    class StenographMachine:
         def __init__(self):
             self._usb_device = HANDLE(0)
             self._read_buffer = create_string_buffer(MAX_READ + StenoPacket.HEADER_SIZE)
@@ -385,7 +385,7 @@ else:
     class StenographMachine(AbstractStenographMachine):
 
         def __init__(self):
-            super(StenographMachine, self).__init__()
+            super().__init__()
             self._usb_device = None
             self._endpoint_in = None
             self._endpoint_out = None
@@ -496,7 +496,7 @@ class Stenograph(ThreadedStenotypeBase):
     KEYMAP_MACHINE_TYPE = 'Stentura'
 
     def __init__(self, params):
-        super(Stenograph, self).__init__()
+        super().__init__()
         self._machine = StenographMachine()
 
     def _on_stroke(self, keys):
@@ -564,7 +564,7 @@ class Stenograph(ThreadedStenotypeBase):
 
     def run(self):
 
-        class ReadState(object):
+        class ReadState:
             def __init__(self):
                 self.realtime = False  # Not realtime until we get a 0-length response
                 self.realtime_file_open = False  # We are reading from a file
@@ -585,7 +585,7 @@ class Stenograph(ThreadedStenotypeBase):
                     StenoPacket.make_read_request(file_offset=state.offset)
                 )
             except IOError as e:
-                log.warning(u'Stenograph machine disconnected, reconnecting…')
+                log.warning('Stenograph machine disconnected, reconnecting…')
                 log.debug('Stenograph exception: %s', e)
                 # User could start a new file while disconnected.
                 state.reset()
@@ -611,6 +611,6 @@ class Stenograph(ThreadedStenotypeBase):
 
     def stop_capture(self):
         """Stop listening for output from the stenotype machine."""
-        super(Stenograph, self).stop_capture()
+        super().stop_capture()
         self._machine = None
         self._stopped()
