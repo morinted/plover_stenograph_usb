@@ -507,7 +507,7 @@ class Stenograph(ThreadedStenotypeBase):
     def start_capture(self):
         self.finished.clear()
         self._initializing()
-        """Begin listening for output from the stenotype machine."""
+        # Begin listening for output from the stenotype machine.
         if not self._connect_machine():
             log.warning('Stenograph machine is not connected')
             self._error()
@@ -542,10 +542,10 @@ class Stenograph(ThreadedStenotypeBase):
         response = self._machine.send_receive(request)
         log.debug('Response from Stenograph: %s', response)
         if response is None:
-            """No response implies device connection issue."""
+            # No response implies device connection issue.
             raise IOError()
         elif response.packet_id == StenoPacket.ID_ERROR:
-            """Writer may reply with an error packet"""
+            # Writer may reply with an error packet.
             error_number = response.p1
             if error_number == 3:
                 raise UnableToPerformRequestException()
@@ -556,7 +556,7 @@ class Stenograph(ThreadedStenotypeBase):
             elif error_number == 9:
                 raise FinishedReadingClosedFileException()
         else:
-            """Writer has returned a packet"""
+            # Writer has returned a packet.
             if (response.packet_id != request.packet_id
                     or response.sequence_number != request.sequence_number):
                 raise ProtocolViolationException()
