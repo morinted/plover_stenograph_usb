@@ -703,6 +703,7 @@ class Stenograph(ThreadedStenotypeBase):
                 if response.data_length and state.realtime:
                     for stroke in response.strokes():
                         self._on_stroke(stroke)
+                sleep(0.10)
 
         self._machine.disconnect()
 
