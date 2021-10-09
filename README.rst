@@ -34,3 +34,11 @@ Plugins Manager.
 .. _Stenograph USB Drivers: http://www.stenograph.com/utilities-links-downloads
 .. _direct link: http://www.stenograph.com/content/files/documents/USB_Writer_Drivers.zip
 .. _libusb: http://macappstore.org/libusb/
+
+Changelog
+---------
+
+v1.1.0:
+
+- Reduce CPU usage
+- Fix support for 64-bit Windows
