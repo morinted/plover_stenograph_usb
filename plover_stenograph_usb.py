@@ -488,6 +488,8 @@ else:
 
     from usb import core, util
 
+    from pyusb_libusb1_backend import get_pyusb_backend
+
     class StenographMachine(AbstractStenographMachine):
 
         def __init__(self):
@@ -503,8 +505,10 @@ else:
             if self._connected:
                 self.disconnect()
 
+            backend = get_pyusb_backend()
+
             # Find the device by the vendor ID.
-            usb_device = core.find(idVendor=VENDOR_ID)
+            usb_device = core.find(backend=backend, idVendor=VENDOR_ID)
             if not usb_device:  # Device not found
                 return self._connected
 
