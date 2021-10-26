@@ -22,8 +22,7 @@ Get the Drivers
 ---------------
 
 -  On Windows, install the `Stenograph USB Drivers`_ (`direct link`_)
--  On Mac, install `libusb`_
--  On Linux, ensure you have libusb installed
+-  On Mac and Linux, the plugin should work without additional software as we package libusb
 
 Installation
 ------------
@@ -33,10 +32,13 @@ Plugins Manager.
 
 .. _Stenograph USB Drivers: http://www.stenograph.com/utilities-links-downloads
 .. _direct link: http://www.stenograph.com/content/files/documents/USB_Writer_Drivers.zip
-.. _libusb: http://macappstore.org/libusb/
 
 Changelog
 ---------
+
+v1.2.0:
+
+- Package libusb to remove the need to install it on Mac and Linux
 
 v1.1.0:
 
