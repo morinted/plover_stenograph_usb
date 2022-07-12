@@ -36,6 +36,10 @@ Plugins Manager.
 Changelog
 ---------
 
+v1.2.1:
+
+- Compatibility with newer versions of python/plover
+
 v1.2.0:
 
 - Package libusb to remove the need to install it on Mac and Linux
