@@ -197,7 +197,7 @@ class StenoPacket:
         assert self.packet_id == self.ID_READ
 
         strokes = []
-        for stroke_data in grouper(8, self.data, fillvalue=0):
+        for stroke_data in grouper(self.data, 8, fillvalue=0):
             stroke = []
             # Get 4 bytes of steno, ignore timestamp.
             for steno_byte, key_chart_row in zip(stroke_data, STENO_KEY_CHART):
